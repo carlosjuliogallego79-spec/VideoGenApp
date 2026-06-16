@@ -2,6 +2,7 @@ __pycache__/
 *.pyc
 *.pyo
 *.spec
+!buildozer.spec
 bin/
 build/
 .dists/
