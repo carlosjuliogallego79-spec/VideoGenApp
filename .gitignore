@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+*.pyo
+*.spec
+bin/
+build/
+.dists/
+Android/
+*.apk
+*.aab
+*.log
+.env
+build_logs/
+build_logs2/
+*.zip
+scripts/

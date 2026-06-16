@@ -1,0 +1,44 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y python3-pip python3-dev libffi-dev libssl-dev
+          sudo apt install -y libjpeg-dev zlib1g-dev liblzma-dev
+          sudo apt install -y libtool autoconf-archive automake pkg-config
+          pip install --user buildozer cython
+
+      - name: Accept Android SDK license
+        run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+          mkdir -p "$ANDROID_HOME/licenses" || true
+          echo "8933bad161af4178b1185d1a37fbf41ea5269c55" > "$ANDROID_HOME/licenses/android-sdk-license" || true
+          echo "d56f5187479451eabf01fb78af6dfcb131a6481e" >> "$ANDROID_HOME/licenses/android-sdk-license" || true
+
+      - name: Build with buildozer
+        run: |
+          libtoolize --force --install
+          export ACLOCAL_PATH="/usr/share/aclocal:/usr/share/libtool/build-aux/m4"
+          buildozer android debug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: VideoGenApp-APK
+          path: bin/*.apk
