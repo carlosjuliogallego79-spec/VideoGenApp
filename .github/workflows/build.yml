@@ -8,15 +8,24 @@ on:
 jobs:
   build:
     runs-on: ubuntu-24.04
-    container:
-      image: kivy/buildozer:latest
     steps:
       - uses: actions/checkout@v6
 
-      - name: Build with buildozer
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
         run: |
-          mkdir -p /home/user/.buildozer
-          buildozer android debug
+          sudo apt update
+          sudo apt install -y python3-dev libffi-dev libssl-dev
+          sudo apt install -y libjpeg-dev zlib1g-dev liblzma-dev
+          sudo apt install -y libtool autoconf-archive automake pkg-config autoconf
+          pip install buildozer cython
+
+      - name: Build with buildozer
+        run: buildozer android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
