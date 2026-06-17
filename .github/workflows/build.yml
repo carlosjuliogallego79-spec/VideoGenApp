@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v6
 
@@ -19,10 +19,16 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install -y python3-dev libffi-dev libssl-dev
+          sudo apt install -y python3-pip python3-dev libffi-dev libssl-dev
           sudo apt install -y libjpeg-dev zlib1g-dev liblzma-dev
           sudo apt install -y libtool autoconf-archive automake pkg-config autoconf
           pip install buildozer cython
+
+      - name: Accept Android SDK license
+        run: |
+          mkdir -p ~/.buildozer/android/platform/android-sdk/licenses || true
+          echo "8933bad161af4178b1185d1a37fbf41ea5269c55" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license || true
+          echo "d56f5187479451eabf01fb78af6dfcb131a6481e" >> ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license || true
 
       - name: Build with buildozer
         run: buildozer android debug
