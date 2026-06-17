@@ -7,7 +7,9 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
+    env:
+      ACLOCAL_PATH: /usr/share/aclocal:/usr/share/libtool/build-aux/m4
     steps:
       - uses: actions/checkout@v6
 
