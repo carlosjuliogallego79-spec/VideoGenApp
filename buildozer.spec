@@ -19,8 +19,8 @@ version.code = 1
 source.dir = .
 source.include_exts = py,png,jpg,kv,atlas,ttf,json
 
-# Requisitos para python-for-android
-requirements = python3,kivy,ffmpeg,Pillow,requests,android
+# Requisitos para python-for-android (ffmpeg removido para velocidad)
+requirements = python3,kivy,Pillow,requests,android
 
 # Permisos de Android
 android.permissions = INTERNET,RECORD_AUDIO,WRITE_EXTERNAL_STORAGE,READ_EXTERNAL_STORAGE,READ_MEDIA_IMAGES,READ_MEDIA_AUDIO,READ_MEDIA_VIDEO
@@ -66,10 +66,10 @@ android.extra_files =
 # Meta-datos
 osx.codesign =
 
-# Configuración de compilación
-log_level = 2
+# Configuración de compilación (optimizada)
+log_level = 1
 debug = 0
-archs = arm64-v8a,armeabi-v7a
+archs = arm64-v8a
 
 # Almacenamiento local en Android
 android.copy_libs = 1
