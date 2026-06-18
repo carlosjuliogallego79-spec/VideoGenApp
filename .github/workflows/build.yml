@@ -24,36 +24,9 @@ jobs:
           cp -r temp_app/android $GITHUB_WORKSPACE/android
           rm -rf temp_app
           cd $GITHUB_WORKSPACE
-          # Fix build config
-          cat android/app/build.gradle
 
       - name: Install dependencies
         run: flutter pub get
 
       - name: Build APK
-        id: build
-        continue-on-error: true
-        shell: bash
-        run: |
-          flutter build apk --release > "$GITHUB_WORKSPACE/build_log.txt" 2>&1 || echo "exit_code=$?" >> "$GITHUB_WORKSPACE/build_log.txt"
-
-      - name: Upload build log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-log
-          path: build_log.txt
-
-      - name: Check build result
-        if: steps.build.outcome == 'failure'
-        run: |
-          echo "=== BUILD FAILED ==="
-          echo "Check artifact 'build-log' for details"
-          exit 1
-
-      - name: Upload APK
-        if: success()
-        uses: actions/upload-artifact@v4
-        with:
-          name: VideoGenApp-APK
-          path: build/app/outputs/flutter-apk/*.apk
+        run: flutter build apk --release --verbose
