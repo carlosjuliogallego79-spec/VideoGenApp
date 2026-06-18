@@ -17,16 +17,34 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Show versions
+        run: |
+          flutter --version
+          java -version 2>&1 || true
+
       - name: Generate Android platform
         run: |
           cd /tmp
           flutter create --project-name videogenapp --platforms android temp_app
           cp -r temp_app/android $GITHUB_WORKSPACE/android
           rm -rf temp_app
-          cd $GITHUB_WORKSPACE
 
       - name: Install dependencies
         run: flutter pub get
 
       - name: Build APK
-        run: flutter build apk --release --verbose
+        run: flutter build apk --release --verbose 2>&1 | tee /tmp/build_log.txt
+
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: /tmp/build_log.txt
+
+      - name: Upload APK
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: VideoGenApp-APK
+          path: build/app/outputs/flutter-apk/*.apk
