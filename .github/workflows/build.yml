@@ -33,7 +33,9 @@ jobs:
         run: flutter pub get
 
       - name: Build APK
-        run: flutter build apk --release --verbose 2>&1 | tee /tmp/build_log.txt
+        run: |
+          set -o pipefail
+          flutter build apk --release --verbose 2>&1 | tee /tmp/build_log.txt
 
       - name: Upload build log
         if: always()
@@ -41,6 +43,16 @@ jobs:
         with:
           name: build-log
           path: /tmp/build_log.txt
+
+      - name: List build outputs
+        if: always()
+        run: |
+          echo "=== Build outputs ==="
+          find build -name "*.apk" -o -name "*.aab" 2>/dev/null || echo "No APK/AAB found"
+          echo "=== Android dir ==="
+          ls -la android/ 2>/dev/null || echo "No android dir"
+          echo "=== Project root ==="
+          ls -la
 
       - name: Upload APK
         if: success()
