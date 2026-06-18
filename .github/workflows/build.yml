@@ -33,29 +33,46 @@ jobs:
         run: flutter pub get
 
       - name: Dart analyze
-        run: flutter analyze
+        run: |
+          flutter analyze 2>&1 | tee /tmp/analyze_log.txt
+          if [ ${PIPESTATUS[0]} -ne 0 ]; then
+            echo "::group::Dart analyze errors"
+            grep -i "error" /tmp/analyze_log.txt
+            echo "::endgroup::"
+            exit 1
+          fi
 
       - name: Build APK
         run: |
           set -o pipefail
           flutter build apk --release --verbose 2>&1 | tee /tmp/build_log.txt
 
-      - name: Show errors from build log
+      - name: Show errors from analyze/build log
         if: failure()
         run: |
-          echo "=== Last 50 lines of build log ==="
-          tail -50 /tmp/build_log.txt
-          echo "=== All errors ==="
-          grep -i "error" /tmp/build_log.txt || echo "No 'error' lines found"
-          echo "=== All FAILED lines ==="
-          grep -i "FAILED" /tmp/build_log.txt || echo "No FAILED lines"
+          if [ -f /tmp/analyze_log.txt ]; then
+            echo "=== Dart analyze errors ==="
+            grep -n "error" /tmp/analyze_log.txt || echo "No 'error' lines in analyze log"
+            echo "=== Dart analyze warnings ==="
+            grep -n "warning" /tmp/analyze_log.txt || echo "No 'warning' lines in analyze log"
+          fi
+          if [ -f /tmp/build_log.txt ]; then
+            echo "=== Tail of build log ==="
+            tail -50 /tmp/build_log.txt
+            echo "=== Build errors ==="
+            grep -n "error" /tmp/build_log.txt || echo "No 'error' lines in build log"
+            echo "=== FAILED lines ==="
+            grep -n "FAILED" /tmp/build_log.txt || echo "No FAILED lines"
+          fi
 
-      - name: Upload build log
+      - name: Upload logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: build-log
-          path: /tmp/build_log.txt
+          name: build-logs
+          path: |
+            /tmp/analyze_log.txt
+            /tmp/build_log.txt
 
       - name: List build outputs
         if: always()
