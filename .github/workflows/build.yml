@@ -32,10 +32,23 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Dart analyze
+        run: flutter analyze
+
       - name: Build APK
         run: |
           set -o pipefail
           flutter build apk --release --verbose 2>&1 | tee /tmp/build_log.txt
+
+      - name: Show errors from build log
+        if: failure()
+        run: |
+          echo "=== Last 50 lines of build log ==="
+          tail -50 /tmp/build_log.txt
+          echo "=== All errors ==="
+          grep -i "error" /tmp/build_log.txt || echo "No 'error' lines found"
+          echo "=== All FAILED lines ==="
+          grep -i "FAILED" /tmp/build_log.txt || echo "No FAILED lines"
 
       - name: Upload build log
         if: always()
