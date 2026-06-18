@@ -73,7 +73,7 @@ class _TTSPageState extends State<TTSPage> {
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<Voice>(
-              value: _selectedVoice,
+              initialValue: _selectedVoice,
               decoration: const InputDecoration(labelText: 'Voz'),
               items: Voice.availableVoices.map((v) => DropdownMenuItem(value: v, child: Text(v.name))).toList(),
               onChanged: (v) => setState(() => _selectedVoice = v!),

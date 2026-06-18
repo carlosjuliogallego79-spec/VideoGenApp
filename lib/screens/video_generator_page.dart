@@ -91,7 +91,7 @@ class _VideoGeneratorPageState extends State<VideoGeneratorPage> {
             TextField(controller: _fpsController, decoration: const InputDecoration(labelText: 'FPS')),
             TextField(controller: _durationController, decoration: const InputDecoration(labelText: 'Duración por imagen (s)')),
             DropdownButtonFormField<String>(
-              value: _transition,
+              initialValue: _transition,
               decoration: const InputDecoration(labelText: 'Transición'),
               items: ['fade', 'slide', 'zoom'].map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
               onChanged: (v) => setState(() => _transition = v!),
