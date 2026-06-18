@@ -22,7 +22,7 @@ class _VoiceSyncPageState extends State<VoiceSyncPage> {
     final allowedExtensions = type == 'video'
         ? ['mp4', 'avi', 'mov', 'mkv', 'webm', 'flv']
         : ['mp3', 'wav', 'ogg', 'aac', 'flac', 'm4a'];
-    final result = await FilePicker.platform.pickFiles(
+    final result = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: allowedExtensions,
     );

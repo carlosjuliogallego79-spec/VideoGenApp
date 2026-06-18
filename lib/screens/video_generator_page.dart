@@ -30,7 +30,7 @@ class _VideoGeneratorPageState extends State<VideoGeneratorPage> {
   }
 
   Future<void> _pickImages() async {
-    final result = await FilePicker.platform.pickFiles(
+    final result = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'],
       allowMultiple: true,
