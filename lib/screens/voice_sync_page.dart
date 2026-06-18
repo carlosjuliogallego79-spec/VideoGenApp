@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 import '../services/voice_sync_service.dart';
 
 class VoiceSyncPage extends StatefulWidget {
@@ -18,8 +19,23 @@ class _VoiceSyncPageState extends State<VoiceSyncPage> {
   double _progress = 0;
 
   Future<void> _pickFile(String type) async {
-    // TODO: Implement file_picker
-    setState(() => _status = 'Selector de archivos no implementado');
+    final allowedExtensions = type == 'video'
+        ? ['mp4', 'avi', 'mov', 'mkv', 'webm', 'flv']
+        : ['mp3', 'wav', 'ogg', 'aac', 'flac', 'm4a'];
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: allowedExtensions,
+    );
+    if (result != null && result.paths.isNotEmpty && result.paths[0] != null) {
+      setState(() {
+        if (type == 'video') {
+          _selectedVideo = result.paths[0];
+        } else {
+          _selectedAudio = result.paths[0];
+        }
+        _status = '${type == 'video' ? "Video" : "Audio"} seleccionado';
+      });
+    }
   }
 
   Future<void> _syncAudio() async {

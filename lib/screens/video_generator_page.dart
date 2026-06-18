@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 import '../services/video_service.dart';
 
 class VideoGeneratorPage extends StatefulWidget {
@@ -29,8 +30,17 @@ class _VideoGeneratorPageState extends State<VideoGeneratorPage> {
   }
 
   Future<void> _pickImages() async {
-    // TODO: Implement file_picker
-    setState(() => _status = 'Selector de imágenes no implementado');
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'],
+      allowMultiple: true,
+    );
+    if (result != null) {
+      setState(() {
+        _selectedImages = result.paths.where((p) => p != null).cast<String>().toList();
+        _status = 'Imágenes seleccionadas: ${_selectedImages.length}';
+      });
+    }
   }
 
   Future<void> _generate() async {

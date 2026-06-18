@@ -12,7 +12,7 @@ class TTSService {
   }) async {
     try {
       await _tts.setLanguage(voice);
-      await _tts.setSpeechRate(speed);
+      await _tts.setSpeechRate(speed * 0.5);
       await _tts.setPitch(pitch);
       await _tts.speak(text);
       return '/storage/emulated/0/VideoGenApp/audio/$outputName';
