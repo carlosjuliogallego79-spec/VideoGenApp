@@ -1,17 +1,24 @@
-__pycache__/
-*.pyc
-*.pyo
-*.spec
-!buildozer.spec
-bin/
+# Flutter
+.dart_tool/
+.packages
 build/
-.dists/
-Android/
-*.apk
-*.aab
-*.log
-.env
+*.iml
+.idea/
+.vscode/
+*.lock
+
+# Python (legacy)
+*.pyc
+__pycache__/
+*.spec
+buildozer.spec
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp
+*.zip
 build_logs/
 build_logs2/
-*.zip
 scripts/

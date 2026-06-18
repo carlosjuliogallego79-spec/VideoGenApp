@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build Flutter APK
 
 on:
   push:
@@ -11,41 +11,29 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: Install apt deps
-        run: |
-          sudo apt update
-          sudo apt install -y python3-pip python3-dev python3-virtualenv
-          sudo apt install -y libffi-dev libssl-dev libjpeg-dev zlib1g-dev
-          sudo apt install -y liblzma-dev libtool autoconf-archive automake pkg-config
-          sudo apt install -y ccache libncurses5-dev libncursesw5-dev
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.x'
+          channel: 'stable'
+          cache: true
 
-      - name: Install buildozer
+      - name: Generate Android platform
         run: |
-          python3 -m pip install --user --upgrade pip
-          python3 -m pip install --user buildozer cython
+          cd /tmp
+          flutter create --project-name videogenapp --platforms android temp_app
+          cp -r temp_app/android $GITHUB_WORKSPACE/android
+          rm -rf temp_app
+          cd $GITHUB_WORKSPACE
+          ls -la android/
+
+      - name: Install dependencies
+        run: flutter pub get
 
       - name: Build APK
-        id: build
-        continue-on-error: true
-        run: |
-          export PATH=$HOME/.local/bin:$PATH
-          python3 -m buildozer android debug 2>&1 | tee build_output.txt || true
-
-      - name: Upload build log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-log
-          path: build_output.txt
-          if-no-files-found: warn
-
-      - name: Fail if build failed
-        if: steps.build.outcome == 'failure'
-        run: exit 1
+        run: flutter build apk --release
 
       - name: Upload APK
-        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: VideoGenApp-APK
-          path: bin/*.apk
+          path: build/app/outputs/flutter-apk/*.apk
