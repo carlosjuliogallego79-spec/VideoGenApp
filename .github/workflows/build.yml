@@ -29,6 +29,18 @@ jobs:
           cp -r temp_app/android $GITHUB_WORKSPACE/android
           rm -rf temp_app
 
+      - name: Fix gradle.properties for AGP 9 built-in Kotlin
+        run: |
+          set -x
+          # AGP 9+ has built-in Kotlin support; disable the old opt-out flags
+          # so that file_picker's Kotlin sources compile even without explicit kotlin-android plugin
+          for f in android/gradle.properties; do
+            sed -i 's/android.builtInKotlin=false/android.builtInKotlin=true/g' "$f"
+            sed -i 's/android.newDsl=false/android.newDsl=true/g' "$f"
+            echo "Patched $f:"
+            grep -E '(builtInKotlin|newDsl)' "$f" || true
+          done
+
       - name: Clean stale GeneratedPluginRegistrant
         run: |
           set -x
