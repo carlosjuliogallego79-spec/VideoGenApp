@@ -29,6 +29,17 @@ jobs:
           cp -r temp_app/android $GITHUB_WORKSPACE/android
           rm -rf temp_app
 
+      - name: Clean stale GeneratedPluginRegistrant
+        run: |
+          set -x
+          TARGET="android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java"
+          if [ -f "$TARGET" ]; then
+            rm -v "$TARGET"
+            echo "Deleted stale GeneratedPluginRegistrant (was from temp project without plugins)"
+          else
+            echo "No GeneratedPluginRegistrant to clean"
+          fi
+
       - name: Install dependencies
         run: flutter pub get
 
