@@ -29,17 +29,34 @@ jobs:
           cp -r temp_app/android $GITHUB_WORKSPACE/android
           rm -rf temp_app
 
-      - name: Fix gradle.properties for AGP 9 built-in Kotlin
+      - name: Fix Kotlin compilation for file_picker plugin
         run: |
           set -x
-          # AGP 9+ has built-in Kotlin support; disable the old opt-out flags
-          # so that file_picker's Kotlin sources compile even without explicit kotlin-android plugin
-          for f in android/gradle.properties; do
-            sed -i 's/android.builtInKotlin=false/android.builtInKotlin=true/g' "$f"
-            sed -i 's/android.newDsl=false/android.newDsl=true/g' "$f"
-            echo "Patched $f:"
-            grep -E '(builtInKotlin|newDsl)' "$f" || true
+
+          # 1. Remove deprecated android.builtInKotlin flag from ALL gradle.properties
+          #    (AGP 9+ default is true; explicit false breaks plugins that skip kotlin-android for AGP 9)
+          for f in android/gradle.properties android/app/gradle.properties; do
+            if [ -f "$f" ]; then
+              sed -i '/android\.builtInKotlin/d' "$f"
+              sed -i '/android\.newDsl/d' "$f"
+              echo "Cleaned $f"
+            fi
           done
+
+          # 2. Patch file_picker's build.gradle to always apply kotlin-android plugin
+          #    (its conditional !isAgp9OrAbove check is unreliable under Flutter's SubsetScriptTransformer)
+          FP="$HOME/.pub-cache/hosted/pub.dev/file_picker-11.0.2/android/build.gradle"
+          if [ -f "$FP" ]; then
+            # Insert unconditional apply plugin after com.android.library
+            sed -i 's/^apply plugin: '\''com.android.library'\''/apply plugin: '\''com.android.library'\''\napply plugin: '\''org.jetbrains.kotlin.android'\''/' "$FP"
+            # Disable the version-check condition (keep intact as dead code so the extra } doesn't break syntax)
+            sed -i 's/if (!isAgp9OrAbove)/if (false)/g' "$FP"
+            echo "Patched $FP"
+            grep -n 'kotlin' "$FP" || true
+          else
+            echo "Warning: $FP not found, listing pub cache:"
+            find "$HOME/.pub-cache/hosted/pub.dev" -path '*/file_picker*/android/build.gradle' 2>/dev/null || true
+          fi
 
       - name: Clean stale GeneratedPluginRegistrant
         run: |
