@@ -29,6 +29,20 @@ jobs:
           cp -r temp_app/android $GITHUB_WORKSPACE/android
           rm -rf temp_app
 
+      - name: Clean stale GeneratedPluginRegistrant
+        run: |
+          set -x
+          TARGET="android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java"
+          if [ -f "$TARGET" ]; then
+            rm -v "$TARGET"
+            echo "Deleted stale GeneratedPluginRegistrant (was from temp project without plugins)"
+          else
+            echo "No GeneratedPluginRegistrant to clean"
+          fi
+
+      - name: Install dependencies
+        run: flutter pub get
+
       - name: Fix Kotlin compilation for file_picker plugin
         run: |
           set -x
@@ -57,20 +71,6 @@ jobs:
             echo "Warning: $FP not found, listing pub cache:"
             find "$HOME/.pub-cache/hosted/pub.dev" -path '*/file_picker*/android/build.gradle' 2>/dev/null || true
           fi
-
-      - name: Clean stale GeneratedPluginRegistrant
-        run: |
-          set -x
-          TARGET="android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java"
-          if [ -f "$TARGET" ]; then
-            rm -v "$TARGET"
-            echo "Deleted stale GeneratedPluginRegistrant (was from temp project without plugins)"
-          else
-            echo "No GeneratedPluginRegistrant to clean"
-          fi
-
-      - name: Install dependencies
-        run: flutter pub get
 
       - name: Dart analyze
         run: |
