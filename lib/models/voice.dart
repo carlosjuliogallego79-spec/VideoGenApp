@@ -16,11 +16,6 @@ class Voice {
 
   static const List<Voice> availableVoices = [
     Voice(name: 'Español - México', lang: 'es-MX'),
-    Voice(name: 'Español - Colombia', lang: 'es-CO'),
-    Voice(name: 'Español - Argentina', lang: 'es-AR'),
-    Voice(name: 'Español - Chile', lang: 'es-CL'),
-    Voice(name: 'Español - Perú', lang: 'es-PE'),
-    Voice(name: 'Español - Venezuela', lang: 'es-VE'),
-    Voice(name: 'Español - Estados Unidos', lang: 'es-US'),
+    Voice(name: 'Español - España', lang: 'es-ES'),
   ];
 }
