@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/tts_service.dart';
+import '../services/file_manager.dart';
 import '../models/voice.dart';
 
 class TTSPage extends StatefulWidget {
@@ -10,15 +11,39 @@ class TTSPage extends StatefulWidget {
 }
 
 class _TTSPageState extends State<TTSPage> {
-  final _ttsService = TTSService();
+  TTSService _ttsService = TTSService();
   final _textController = TextEditingController(
     text: 'Hola, bienvenido a VideoGenApp. Esta es una prueba de texto a voz.',
   );
+  List<Voice> _voices = Voice.availableVoices;
   Voice _selectedVoice = Voice.availableVoices[0];
   double _speed = 1.0;
   double _pitch = 1.0;
-  String _status = 'Listo';
+  String _status = 'Cargando...';
   double _progress = 0;
+  bool _ready = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  Future<void> _init() async {
+    try {
+      final fm = await FileManager.create();
+      final service = TTSService(baseDir: fm.baseDir);
+      final engineVoices = await service.getAvailableVoices();
+      if (mounted) setState(() {
+        _ttsService = service;
+        _voices = engineVoices;
+        _selectedVoice = _voices.isNotEmpty ? _voices[0] : Voice.availableVoices[0];
+        _ready = true;
+      });
+    } catch (_) {
+      if (mounted) setState(() { _ready = true; });
+    }
+  }
 
   @override
   void dispose() {
@@ -40,6 +65,7 @@ class _TTSPageState extends State<TTSPage> {
       speed: _speed,
       pitch: _pitch,
       preview: preview,
+      voiceId: _selectedVoice.voiceId,
     );
 
     setState(() => _progress = 1.0);
@@ -78,9 +104,9 @@ class _TTSPageState extends State<TTSPage> {
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<Voice>(
-              initialValue: _selectedVoice,
+              value: _selectedVoice,
               decoration: const InputDecoration(labelText: 'Voz'),
-              items: Voice.availableVoices.map((v) => DropdownMenuItem(value: v, child: Text(v.name))).toList(),
+              items: _voices.map((v) => DropdownMenuItem(value: v, child: Text(v.name.length > 35 ? '${v.name.substring(0, 35)}...' : v.name))).toList(),
               onChanged: (v) => setState(() => _selectedVoice = v!),
             ),
             Row(children: [
@@ -95,9 +121,9 @@ class _TTSPageState extends State<TTSPage> {
             ]),
             const SizedBox(height: 16),
             Row(children: [
-              Expanded(child: ElevatedButton(onPressed: () => _generate(preview: true), child: const Text('Vista Previa'))),
+              Expanded(child: ElevatedButton(onPressed: _ready ? () => _generate(preview: true) : null, child: const Text('Vista Previa'))),
               const SizedBox(width: 8),
-              Expanded(child: ElevatedButton(onPressed: () => _generate(), style: ElevatedButton.styleFrom(backgroundColor: Colors.green), child: const Text('Generar Audio'))),
+              Expanded(child: ElevatedButton(onPressed: _ready ? () => _generate() : null, style: ElevatedButton.styleFrom(backgroundColor: Colors.green), child: const Text('Generar Audio'))),
             ]),
             const SizedBox(height: 16),
             LinearProgressIndicator(value: _progress),
