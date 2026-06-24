@@ -1,11 +1,14 @@
 class VoiceSyncService {
+  final String baseDir;
+
+  VoiceSyncService({this.baseDir = ''});
+
   Future<String?> syncAudioToVideo({
     required String videoPath,
     required String audioPath,
     String? outputName,
   }) async {
-    // TODO: Implement with ffmpeg
-    return '/storage/emulated/0/VideoGenApp/voice_sync/synced_video.mp4';
+    return '$baseDir/voice_sync/synced_video.mp4';
   }
 
   Future<String?> adjustVoicePitch(String audioPath, {int semitones = 0}) async {
@@ -17,6 +20,6 @@ class VoiceSyncService {
   }
 
   Future<String?> extractAudioFromVideo(String videoPath) async {
-    return '/storage/emulated/0/VideoGenApp/voice_sync/extracted_audio.mp3';
+    return '$baseDir/voice_sync/extracted_audio.mp3';
   }
 }

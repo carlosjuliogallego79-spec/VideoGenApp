@@ -2,6 +2,9 @@ import 'package:flutter_tts/flutter_tts.dart';
 
 class TTSService {
   final FlutterTts _tts = FlutterTts();
+  final String baseDir;
+
+  TTSService({this.baseDir = ''});
 
   Future<String?> textToSpeech({
     required String text,
@@ -15,7 +18,7 @@ class TTSService {
       await _tts.setSpeechRate(speed * 0.5);
       await _tts.setPitch(pitch);
       await _tts.speak(text);
-      return '/storage/emulated/0/VideoGenApp/audio/$outputName';
+      return '$baseDir/audio/$outputName';
     } catch (e) {
       return null;
     }

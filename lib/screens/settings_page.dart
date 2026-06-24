@@ -11,8 +11,16 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   final _ffmpeg = FFmpegHelper();
-  final _fileManager = FileManager();
+  FileManager? _fileManager;
   String _status = 'Listo';
+
+  @override
+  void initState() {
+    super.initState();
+    FileManager.create().then((fm) {
+      if (mounted) setState(() => _fileManager = fm);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +35,7 @@ class _SettingsPageState extends State<SettingsPage> {
           const Divider(),
           Text('Almacenamiento', style: Theme.of(context).textTheme.titleMedium),
           ListTile(
-            title: Text('Espacio usado: ${_fileManager.getStorageInfo()}'),
+            title: Text('Espacio usado: ${_fileManager?.getStorageInfo() ?? "Calculando..."}'),
           ),
           const Divider(),
           Text('Acciones', style: Theme.of(context).textTheme.titleMedium),
@@ -35,7 +43,7 @@ class _SettingsPageState extends State<SettingsPage> {
             leading: const Icon(Icons.cleaning_services),
             title: const Text('Limpiar Archivos Temporales'),
             onTap: () {
-              _fileManager.clearTemp();
+              _fileManager?.clearTemp();
               setState(() => _status = 'Archivos temporales limpiados');
             },
           ),

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 
 class FileManager {
   late final String baseDir;
@@ -12,38 +13,61 @@ class FileManager {
     'audio': ['.mp3', '.wav', '.ogg', '.aac', '.flac', '.m4a'],
   };
 
-  FileManager() {
-    baseDir = '/storage/emulated/0/VideoGenApp';
-    importDir = '$baseDir/imports';
-    exportDir = '$baseDir/exports';
-    tempDir = '$baseDir/temp';
-    for (final d in [importDir, exportDir, tempDir]) {
-      Directory(d).createSync(recursive: true);
+  FileManager._();
+
+  static Future<FileManager> create() async {
+    final fm = FileManager._();
+    await fm._init();
+    return fm;
+  }
+
+  Future<void> _init() async {
+    try {
+      final appDir = await getApplicationDocumentsDirectory();
+      baseDir = appDir.path;
+      importDir = '$baseDir/imports';
+      exportDir = '$baseDir/exports';
+      tempDir = '$baseDir/temp';
+      for (final d in [importDir, exportDir, tempDir]) {
+        await Directory(d).create(recursive: true);
+      }
+    } catch (e) {
+      baseDir = '/tmp/VideoGenApp';
+      importDir = '$baseDir/imports';
+      exportDir = '$baseDir/exports';
+      tempDir = '$baseDir/temp';
     }
   }
 
   String getStorageInfo() {
-    int totalSize = 0;
-    final dir = Directory(baseDir);
-    if (dir.existsSync()) {
+    try {
+      final dir = Directory(baseDir);
+      if (!dir.existsSync()) return '0 B';
+      int totalSize = 0;
       for (var entity in dir.listSync(recursive: true)) {
         if (entity is File) {
           totalSize += entity.lengthSync();
         }
       }
+      if (totalSize < 1024) return '$totalSize B';
+      if (totalSize < 1024 * 1024) return '${(totalSize / 1024).toStringAsFixed(1)} KB';
+      if (totalSize < 1024 * 1024 * 1024) return '${(totalSize / (1024 * 1024)).toStringAsFixed(1)} MB';
+      return '${(totalSize / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
+    } catch (e) {
+      return 'Error';
     }
-    if (totalSize < 1024) return '$totalSize B';
-    if (totalSize < 1024 * 1024) return '${(totalSize / 1024).toStringAsFixed(1)} KB';
-    if (totalSize < 1024 * 1024 * 1024) return '${(totalSize / (1024 * 1024)).toStringAsFixed(1)} MB';
-    return '${(totalSize / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
   }
 
   void clearTemp() {
-    final dir = Directory(tempDir);
-    if (dir.existsSync()) {
-      for (var entity in dir.listSync()) {
-        if (entity is File) entity.deleteSync();
+    try {
+      final dir = Directory(tempDir);
+      if (dir.existsSync()) {
+        for (var entity in dir.listSync()) {
+          if (entity is File) entity.deleteSync();
+        }
       }
+    } catch (e) {
+      // Silently fail
     }
   }
 }

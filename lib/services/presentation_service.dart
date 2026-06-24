@@ -2,6 +2,9 @@ import '../models/slide.dart';
 
 class PresentationService {
   final List<Slide> slides = [];
+  final String baseDir;
+
+  PresentationService({this.baseDir = ''});
 
   void addSlide(Slide slide) => slides.add(slide);
 
@@ -9,7 +12,7 @@ class PresentationService {
 
   Future<String?> generatePresentation() async {
     if (slides.isEmpty) return null;
-    return '/storage/emulated/0/VideoGenApp/videos/presentation.mp4';
+    return '$baseDir/videos/presentation.mp4';
   }
 
   String exportToJson() {
@@ -18,6 +21,5 @@ class PresentationService {
 
   void importFromJson(String json) {
     clearSlides();
-    // Parse JSON and add slides
   }
 }
