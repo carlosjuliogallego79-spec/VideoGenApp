@@ -31,9 +31,7 @@ class TTSService {
       }
       final outPath = '${outDir.path}/$outputName';
 
-      // flutter_tts synthesizes to file after setting save path
-      await _tts.setSaveToFile(outPath);
-      await _tts.speak(text);
+      await _tts.synthesizeToFile(text, outPath, true);
 
       return outPath;
     } catch (e) {
