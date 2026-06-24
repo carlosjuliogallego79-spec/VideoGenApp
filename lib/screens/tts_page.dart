@@ -34,12 +34,14 @@ class _TTSPageState extends State<TTSPage> {
       final fm = await FileManager.create();
       final service = TTSService(baseDir: fm.baseDir);
       final engineVoices = await service.getAvailableVoices();
-      if (mounted) setState(() {
-        _ttsService = service;
-        _voices = engineVoices;
-        _selectedVoice = _voices.isNotEmpty ? _voices[0] : Voice.availableVoices[0];
-        _ready = true;
-      });
+      if (mounted) {
+        setState(() {
+          _ttsService = service;
+          _voices = engineVoices;
+          _selectedVoice = _voices.isNotEmpty ? _voices[0] : Voice.availableVoices[0];
+          _ready = true;
+        });
+      }
     } catch (_) {
       if (mounted) setState(() { _ready = true; });
     }
@@ -104,7 +106,8 @@ class _TTSPageState extends State<TTSPage> {
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<Voice>(
-              value: _selectedVoice,
+              key: ValueKey(_voices.length),
+              initialValue: _selectedVoice,
               decoration: const InputDecoration(labelText: 'Voz'),
               items: _voices.map((v) => DropdownMenuItem(value: v, child: Text(v.name.length > 35 ? '${v.name.substring(0, 35)}...' : v.name))).toList(),
               onChanged: (v) => setState(() => _selectedVoice = v!),
