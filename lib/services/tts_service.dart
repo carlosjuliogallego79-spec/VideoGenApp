@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter_tts/flutter_tts.dart';
 
 class TTSService {
@@ -8,17 +9,33 @@ class TTSService {
 
   Future<String?> textToSpeech({
     required String text,
-    String outputName = 'tts_output.mp3',
+    String outputName = 'tts_output.wav',
     String voice = 'es-MX',
     double speed = 1.0,
     double pitch = 1.0,
+    bool preview = false,
   }) async {
     try {
       await _tts.setLanguage(voice);
       await _tts.setSpeechRate(speed * 0.5);
       await _tts.setPitch(pitch);
+
+      if (preview) {
+        await _tts.speak(text);
+        return 'preview_played';
+      }
+
+      final outDir = Directory('$baseDir/audio');
+      if (!await outDir.exists()) {
+        await outDir.create(recursive: true);
+      }
+      final outPath = '${outDir.path}/$outputName';
+
+      // flutter_tts synthesizes to file after setting save path
+      await _tts.setSaveToFile(outPath);
       await _tts.speak(text);
-      return '$baseDir/audio/$outputName';
+
+      return outPath;
     } catch (e) {
       return null;
     }

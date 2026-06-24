@@ -35,16 +35,21 @@ class _TTSPageState extends State<TTSPage> {
 
     final output = await _ttsService.textToSpeech(
       text: _textController.text.trim(),
-      outputName: preview ? 'preview.mp3' : 'tts_output.mp3',
+      outputName: 'tts_output.wav',
       voice: _selectedVoice.lang,
       speed: _speed,
       pitch: _pitch,
+      preview: preview,
     );
 
     setState(() => _progress = 1.0);
     if (output != null) {
-      setState(() => _status = preview ? 'Vista previa lista' : 'Audio generado');
-      if (mounted) _showSuccess('Audio guardado en:\n$output');
+      if (preview) {
+        setState(() => _status = 'Vista previa lista');
+      } else {
+        setState(() => _status = 'Audio generado');
+        if (mounted) _showSuccess('Audio guardado en:\n$output');
+      }
     } else {
       setState(() { _status = 'Error generando audio'; _progress = 0; });
     }

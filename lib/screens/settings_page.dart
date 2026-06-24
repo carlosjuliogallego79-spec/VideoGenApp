@@ -35,6 +35,10 @@ class _SettingsPageState extends State<SettingsPage> {
           const Divider(),
           Text('Almacenamiento', style: Theme.of(context).textTheme.titleMedium),
           ListTile(
+            title: const Text('Carpeta de archivos'),
+            subtitle: Text(_fileManager?.baseDir ?? 'Cargando...'),
+          ),
+          ListTile(
             title: Text('Espacio usado: ${_fileManager?.getStorageInfo() ?? "Calculando..."}'),
           ),
           const Divider(),

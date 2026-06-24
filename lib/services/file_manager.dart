@@ -23,8 +23,8 @@ class FileManager {
 
   Future<void> _init() async {
     try {
-      final appDir = await getApplicationDocumentsDirectory();
-      baseDir = appDir.path;
+      final appsDir = await getExternalStorageDirectory();
+      baseDir = appsDir!.path;
       importDir = '$baseDir/imports';
       exportDir = '$baseDir/exports';
       tempDir = '$baseDir/temp';
@@ -32,10 +32,21 @@ class FileManager {
         await Directory(d).create(recursive: true);
       }
     } catch (e) {
-      baseDir = '/tmp/VideoGenApp';
-      importDir = '$baseDir/imports';
-      exportDir = '$baseDir/exports';
-      tempDir = '$baseDir/temp';
+      try {
+        final appDir = await getApplicationDocumentsDirectory();
+        baseDir = appDir.path;
+        importDir = '$baseDir/imports';
+        exportDir = '$baseDir/exports';
+        tempDir = '$baseDir/temp';
+        for (final d in [importDir, exportDir, tempDir]) {
+          await Directory(d).create(recursive: true);
+        }
+      } catch (e2) {
+        baseDir = '/tmp/VideoGenApp';
+        importDir = '$baseDir/imports';
+        exportDir = '$baseDir/exports';
+        tempDir = '$baseDir/temp';
+      }
     }
   }
 
